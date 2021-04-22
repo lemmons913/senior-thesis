@@ -12,7 +12,7 @@ library(tidyr)
 library(stringr)
 library(broom)
 
-data <- read.csv("data/states_and_counties.csv")
+data <- read.csv("Data/states_and_counties.csv")
 #colnames(data)
 
 data = subset(data, select = -c(inf_mar, inf_apr, inf_may, inf_jun, inf_jul, inf_aug, Demographics,
