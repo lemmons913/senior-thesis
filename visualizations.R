@@ -12,7 +12,7 @@ library(tidyr)
 library(stringr)
 library(broom)
 
-data <- read.csv("data/states_and_counties.csv")
+data <- read.csv("Data/states_and_counties.csv")
 #colnames(data)
 
 data = subset(data, select = -c(inf_mar, inf_apr, inf_may, inf_jun, inf_jul, inf_aug, Demographics,
@@ -142,3 +142,4 @@ dwplot(inf_model, show_intercept = FALSE, ci = .95) %>%
         legend.justification = c(0, 0), 
         legend.background = element_rect(colour="grey80"),
         legend.title = element_blank()) 
+
