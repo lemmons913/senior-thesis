@@ -1,5 +1,6 @@
 #laina emmons 4/10/2021 
-#visualization of regression tables for senior thesis
+#regression analysis on States & Counties dataset
+#dot-and-whisker visualization of regression tables
 
 setwd("/Users/lainaemmons/Documents/senior_thesis")
 getwd()
@@ -9,6 +10,7 @@ library(tidytext)
 library(ggplot2)
 library(tidyr)
 library(stringr)
+library(broom)
 
 data <- read.csv("Data/states_and_counties.csv")
 #colnames(data)
@@ -36,9 +38,6 @@ data <- data %>%
   filter(!death_rate_by_pop == "NA")
 data <- data %>%
   filter(!inf_by_pop == "NA")
-head(data$inf_by_pop)
-min(data$inf_by_pop)
-
 
 ###### deaths only dotwhisker regression plots
 library(dotwhisker)
@@ -48,17 +47,25 @@ gub_inc <- data %>%
 gub_inc <- lm(perc_rep_gov_2020 ~  death_rate_by_pop + perc_non_white +
        unemployment + polls_per_person + early_vote_duration + same_day_reg +
        vra_provision + perc_rep_gov_2016, data = gub_inc)
-#gub_inc
+summary(gub_inc)
 
 trump_inc <- data %>%
   filter(gov_rep_incumbent_2020 == 1) 
 trump_inc <- lm(perc_trump_2020 ~ death_rate_by_pop + perc_non_white +
                   unemployment + polls_per_person + early_vote_duration + same_day_reg +
-                  vra_provision + perc_trump_2016, data = data)
-#trump_inc
-#dwplot(trump_inc)
+                  vra_provision + perc_trump_2016, data = trump_inc)
+summary(trump_inc)
 
-dwplot(list(trump_inc, gub_inc), show_intercept = FALSE, ci = .95) %>%
+death_model <- bind_rows(
+  tidy(gub_inc) %>% mutate(model = "GOP Gov Share of Vote"),
+  tidy(trump_inc) %>% mutate(model = "Trump Share of Vote"))
+
+death_model$model <- factor(death_model$model,
+                            levels = c("Trump Share of Vote", "GOP Gov Share of Vote"),
+                            labels = c("Trump Share of Vote", "GOP Gov Share of Vote")
+)
+
+dwplot(death_model, show_intercept = FALSE, ci = .95) %>%
   relabel_predictors(c(death_rate_by_pop = "Death Rate",
                        perc_non_white = "% Population Non-White",
                        unemployment = "Unemployment Rate",
@@ -69,16 +76,15 @@ dwplot(list(trump_inc, gub_inc), show_intercept = FALSE, ci = .95) %>%
                        perc_trump_2016 = "Trump 2016 %",
                        perc_rep_gov_2016 = "GOP Govornor 2016 %")) +
   ylab("Predictors") + xlab("Coefficient Estimate") + 
-  ggtitle("Regression Analysis on Independent Variables") +
+  ggtitle("Regression Analysis on 2020 Election Models") +
   theme_bw() +
-  labs(subtitle = "       Model 1 = Trump 2020 Share of Vote
-       Model 2 = GOP Governor 2020 Share of Vote
-       
-       This is a dot-and-whisker plot, the dots represent the regression coefficient estimate and the whiskers represent confidence interval. 
+  labs(subtitle = "       This is a dot-and-whisker plot, the dots represent the regression coefficient estimate and the whiskers represent confidence interval. 
        This plot shows that the variable is statistically relevant if the whisker does not cross 0. 
        If the coefficient estimate > 0, the variable positively impacted the share of votes, and vice versa.
        
        by Laina Emmons") +
+  scale_color_brewer(palette = "Set1", 
+                     breaks = c("Trump Share of Vote", "GOP Gov Share of Vote")) +
   theme(plot.title = element_text(face="bold"),
         plot.subtitle = element_text(face = "bold"),
         legend.position = c(0.007, 0.01),
@@ -93,19 +99,24 @@ gub_inc_gov <- data %>%
 gub_inc_gov <- lm(perc_rep_gov_2020 ~  inf_by_pop + perc_non_white + unemployment + 
                 polls_per_person + early_vote_duration + same_day_reg +
                 vra_provision + perc_rep_gov_2016, data = gub_inc_gov)
-
-#gub_inc
+summary(gub_inc_gov)
 
 trump_inc_gov <- data %>%
   filter(gov_rep_incumbent_2020 == 1) 
 trump_inc_gov <- lm(perc_trump_2020 ~ inf_by_pop + perc_non_white +
                   unemployment + polls_per_person + early_vote_duration + same_day_reg +
                   vra_provision + perc_trump_2016, data = trump_inc_gov)
-summ(trump_inc_gov)
-#trump_inc
-#dwplot(trump_inc)
+summary(trump_inc_gov)
 
-dwplot(list(trump_inc_gov, gub_inc_gov), show_intercept = FALSE, ci = .95) %>%
+inf_model <- bind_rows(
+  tidy(gub_inc_gov) %>% mutate(model = "GOP Gov Share of Vote"),
+  tidy(trump_inc_gov) %>% mutate(model = "Trump Share of Vote"))
+
+inf_model$model <- factor(inf_model$model,
+                          levels = c("Trump Share of Vote", "GOP Gov Share of Vote"),
+                          labels = c("Trump Share of Vote", "GOP Gov Share of Vote"))
+
+dwplot(inf_model, show_intercept = FALSE, ci = .95) %>%
   relabel_predictors(c(inf_by_pop = "Infection Rate",
                        perc_non_white = "% Population Non-White",
                        unemployment = "Unemployment Rate",
@@ -116,20 +127,18 @@ dwplot(list(trump_inc_gov, gub_inc_gov), show_intercept = FALSE, ci = .95) %>%
                        perc_trump_2016 = "Trump 2016 %",
                        perc_rep_gov_2016 = "GOP Govornor 2016 %")) +
   ylab("Predictors") + xlab("Coefficient Estimate") + 
-  ggtitle("Regression Analysis on Independent Variables") +
+  ggtitle("Regression Analysis on 2020 Election Models") +
   theme_bw() +
-  labs(subtitle = "       Model 1 = Trump 2020 Share of Vote
-       Model 2 = GOP Governor 2020 Share of Vote
-       
-       This is a dot-and-whisker plot, the dots represent the regression coefficient estimate and the whiskers represent confidence interval. 
+  labs(subtitle = "       This is a dot-and-whisker plot, the dots represent the regression coefficient estimate and the whiskers represent confidence interval. 
        This plot shows that the variable is statistically relevant if the whisker does not cross 0. 
        If the coefficient estimate > 0, the variable positively impacted the share of votes, and vice versa.
        
        by Laina Emmons") +
+  scale_color_brewer(palette = "Set1", 
+                     breaks = c("Trump Share of Vote", "GOP Gov Share of Vote")) +
   theme(plot.title = element_text(face="bold"),
         plot.subtitle = element_text(face = "bold"),
         legend.position = c(0.007, 0.01),
         legend.justification = c(0, 0), 
         legend.background = element_rect(colour="grey80"),
         legend.title = element_blank()) 
-
