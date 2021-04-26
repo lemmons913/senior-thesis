@@ -2,7 +2,7 @@
 #regression analysis on States & Counties dataset
 #dot-and-whisker visualization of regression tables
 
-setwd("/Users/lainaemmons/Documents/senior_thesis")
+setwd("/Users/lainaemmons/Documents/GitHub/senior-thesis")
 getwd()
 
 library(dplyr)
@@ -12,7 +12,7 @@ library(tidyr)
 library(stringr)
 library(broom)
 
-data <- read.csv("Data/states_and_counties.csv")
+data <- read.csv("states_and_counties.csv")
 #colnames(data)
 
 data = subset(data, select = -c(inf_mar, inf_apr, inf_may, inf_jun, inf_jul, inf_aug, Demographics,
