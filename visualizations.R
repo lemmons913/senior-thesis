@@ -34,17 +34,56 @@ data$perc_rep_gov_2020 <- as.numeric(as.character(data$perc_trump_2020))
 data$X2016_turnout <- as.numeric(as.character(data$X2016_turnout))
 data$X2020_turnout <- as.numeric(as.character(data$X2020_turnout))
 
+colnames(data)
 data <- data %>% 
   filter(!death_rate_by_pop == "NA")
 data <- data %>%
   filter(!inf_by_pop == "NA")
+data <- data %>%
+  filter(!unemployment == "NA")
+data <- data %>% 
+  filter(!gov_rep_incumbent_2020 == 0) 
+summary(data)
+
+###### Turnout?
+turnout <- data %>%
+  filter(gov_rep_incumbent_2020 == 1) 
+turnout <- lm(X2020_turnout ~  death_rate_by_pop + inf_by_pop + perc_non_white +
+                unemployment + polls_per_person + early_vote_duration + same_day_reg +
+                vra_provision + X2016_turnout, data = turnout)
+summary(turnout)
+turnout
+
+dwplot(turnout, show_intercept = FALSE, ci = .95) %>%
+  relabel_predictors(c(inf_by_pop = "Infection Rate",
+                       perc_non_white = "% Population Non-White",
+                       unemployment = "Unemployment Rate",
+                       polls_per_person = "Polls per Capita",
+                       early_vote_duration = "Duration of Early Vote Period",
+                       same_day_reg = "Offers Same-Day Registration",
+                       vra_provision = "Subject to VRA Provision",
+                       perc_trump_2016 = "Trump 2016 %",
+                       perc_rep_gov_2016 = "GOP Govornor 2016 %")) +
+  ylab("Predictors") + xlab("Coefficient Estimate") + 
+  ggtitle("Regression Analysis on 2020 Election Models") + 
+  theme_bw() +
+  theme(axis.text = element_text(color = "black", face = "bold")) +
+  labs(subtitle = "by Laina Emmons") +
+  scale_color_brewer(palette = "Set1", 
+                     breaks = c("Trump Share of Vote", "GOP Gov Share of Vote")) +
+  theme(plot.title = element_text(face="bold"),
+        plot.subtitle = element_text(face = "bold"),
+        legend.position = c(0.007, 0.01),
+        legend.justification = c(0, 0), 
+        legend.background = element_rect(colour="grey80"),
+        legend.title = element_blank()) 
 
 ###### deaths only dotwhisker regression plots
 library(dotwhisker)
 
 gub_inc <- data %>%
   filter(gov_rep_incumbent_2020 == 1) 
-gub_inc <- lm(perc_rep_gov_2020 ~  death_rate_by_pop + perc_non_white +
+gub_inc <- lm(perc_rep_gov_2020 ~  death_rate_by_pop +  perc_non_white +
        unemployment + polls_per_person + early_vote_duration + same_day_reg +
        vra_provision + perc_rep_gov_2016, data = gub_inc)
 summary(gub_inc)
