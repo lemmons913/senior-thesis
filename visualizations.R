@@ -41,8 +41,8 @@ data <- data %>%
   filter(!inf_by_pop == "NA")
 data <- data %>%
   filter(!unemployment == "NA")
-data <- data %>% 
-  filter(!gov_rep_incumbent_2020 == 0) 
+#data <- data %>% 
+#  filter(!gov_rep_incumbent_2020 == 0) 
 summary(data)
 
 ###### Turnout?
@@ -181,4 +181,12 @@ dwplot(inf_model, show_intercept = FALSE, ci = .95) %>%
         legend.justification = c(0, 0), 
         legend.background = element_rect(colour="grey80"),
         legend.title = element_blank()) 
+
+#### compared to democrat incumbents
+dems <- data %>%
+  filter(State == c("Delaware", "North Carolina", "Washington"))
+dem_reg <- lm(perc_trump_2020 ~ inf_by_pop + death_rate_by_pop + perc_non_white +
+                unemployment + polls_per_person + early_vote_duration + same_day_reg +
+                vra_provision + perc_trump_2016, data = dems)
+summary(dem_reg)
 
