@@ -1,5 +1,3 @@
-# senior-thesis
-
 # COVID-19 and the 2020 Election: Executive Pandemic Political Accountability at the State and Federal Level
 
 Abstract:
